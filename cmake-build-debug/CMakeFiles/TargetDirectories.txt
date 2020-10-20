@@ -1,3 +1,0 @@
-/home/kevin/DATA/Univ/semestre5/info504/tp3/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/kevin/DATA/Univ/semestre5/info504/tp3/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/kevin/DATA/Univ/semestre5/info504/tp3/cmake-build-debug/CMakeFiles/tp3.dir
