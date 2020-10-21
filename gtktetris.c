@@ -2,17 +2,20 @@
 
 
 int main(int argc, char *argv[]) {
+    Jeu jeu;
+    initialiseGrille(jeu.grille);
+    initialisePieces(jeu.pieces);
 
     gtk_init(&argc, &argv);
 
-    createIHM();
+    createIHM(&jeu);
 
     gtk_main();
 
     return EXIT_SUCCESS;
 }
 
-GtkWidget *createIHM() {
+void createIHM(Jeu *jeu) {
     GtkWidget *window;
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -26,11 +29,11 @@ GtkWidget *createIHM() {
     // Flèches
     GtkWidget *arrowBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *leftArrow = createArrowBtn(GTK_ARROW_LEFT);
-    g_signal_connect(leftArrow, "clicked", G_CALLBACK(left), &val0);
+    g_signal_connect(leftArrow, "clicked", G_CALLBACK(left), NULL);
     GtkWidget *downArrow = createArrowBtn(GTK_ARROW_DOWN);
-    g_signal_connect(downArrow, "clicked", G_CALLBACK(down), &val0);
+    g_signal_connect(downArrow, "clicked", G_CALLBACK(down), NULL);
     GtkWidget *rightArrow = createArrowBtn(GTK_ARROW_RIGHT);
-    g_signal_connect(rightArrow, "clicked", G_CALLBACK(right), &val0);
+    g_signal_connect(rightArrow, "clicked", G_CALLBACK(right), NULL);
     gtk_container_add(GTK_CONTAINER(arrowBox), leftArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), downArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), rightArrow);
@@ -42,7 +45,7 @@ GtkWidget *createIHM() {
     // Boutons new et quit
     GtkWidget *btnBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *newBtn = createLabelBtn("New");
-    g_signal_connect(newBtn, "clicked", G_CALLBACK(new), &val0);
+    g_signal_connect(newBtn, "clicked", G_CALLBACK(new), NULL);
     GtkWidget *quitBtn = createLabelBtn("Quit");
     g_signal_connect(quitBtn, "clicked", G_CALLBACK(gtk_main_quit), NULL);
     gtk_container_add(GTK_CONTAINER(btnBox), newBtn);
@@ -67,8 +70,6 @@ GtkWidget *createIHM() {
 
     gtk_container_add(GTK_CONTAINER(window), mainBox);
     gtk_widget_show_all(window);
-
-    return window;
 }
 
 GtkWidget *createArrowBtn(GtkArrowType type) {
@@ -87,25 +88,17 @@ GtkWidget *createLabelBtn(char *label) {
 }
 
 gboolean left(GtkWidget *widget, gpointer data) {
-    int val1 = *((int *) data);
-    printf("Gauche, val=%d\n", val1);
     return TRUE;
 }
 
 gboolean down(GtkWidget *widget, gpointer data) {
-    int val1 = *((int *) data);
-    printf("Bas, val=%d\n", val1);
     return TRUE;
 }
 
 gboolean right(GtkWidget *widget, gpointer data) {
-    int val1 = *((int *) data);
-    printf("Droite, val=%d\n", val1);
     return TRUE;
 }
 
 gboolean new(GtkWidget *widget, gpointer data) {
-    int val1 = *((int *) data);
-    printf("New, val=%d\n", val1);
     return TRUE;
 }

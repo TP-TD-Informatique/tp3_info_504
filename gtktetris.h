@@ -9,9 +9,16 @@
 
 #define TAILLE_CARRE 16
 
-int val0 = 17;
+typedef struct {
+    Grille grille;
+    Piece pieces[NB_PIECES];
+    int piece; // La piece actuelle
+    int col; // La colonne actuelle
+    int score; // Le score
+    int delay; // Le délais
+} Jeu;
 
-GtkWidget *createIHM();
+void createIHM(Jeu *jeu);
 
 GtkWidget *createArrowBtn(GtkArrowType type);
 
