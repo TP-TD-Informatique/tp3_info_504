@@ -7,6 +7,7 @@ int main(int argc, char *argv[]) {
     Jeu jeu;
     initialiseGrille(jeu.grille);
     initialisePieces(jeu.pieces);
+    jeu.score = 0;
     nouvellePiece(&jeu);
 
     gtk_init(&argc, &argv);
@@ -97,11 +98,11 @@ void dessineGrille(cairo_t *cr, Grille grille) {
     cairo_rectangle(cr, BORDER, 0, TAILLE_CARRE * LARGEUR, TAILLE_CARRE * HAUTEUR + 2 * BORDER);
     cairo_fill(cr);
 
-    for (int i = HAUTEUR - 1; i >= 0; --i) {
-        for (int j = LARGEUR - 1; j >= 0; --j) {
+    for (int i = 0; i < HAUTEUR; ++i) {
+        for (int j = 0; j < LARGEUR; ++j) {
             char c = lireCase(grille, i, j);
             if (c != ' ') {
-                dessineCarre(cr, i, j, c);
+                dessineCarre(cr, HAUTEUR - i - 1, j, c);
             }
         }
     }
@@ -199,6 +200,12 @@ gboolean left(GtkWidget *widget, gpointer data) {
 }
 
 gboolean down(GtkWidget *widget, gpointer data) {
+    Jeu *jeu = (Jeu *) data;
+    Piece piece = jeu->pieces[jeu->piece];
+    int hauteur2 = hauteurExacte(jeu->grille, jeu->col, piece);
+    ecrirePiece(jeu->grille, piece, jeu->col, hauteur2);
+    jeu->score += nettoyer(jeu->grille);
+    nouvellePiece(jeu);
     gtk_widget_queue_draw(canevas);
     return TRUE;
 }
