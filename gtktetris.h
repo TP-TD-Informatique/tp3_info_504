@@ -8,6 +8,9 @@
 #include "tetris.h"
 
 GtkWidget *canevas;
+GtkWidget *delayValue;
+double maxDelay = 10.0;
+double delay = 10.0;
 
 #define TAILLE_CARRE 16
 
@@ -49,5 +52,9 @@ gboolean down(GtkWidget *widget, gpointer data);
 gboolean right(GtkWidget *widget, gpointer data);
 
 gboolean new(GtkWidget *widget, gpointer data);
+
+gint ticDown(gpointer data);
+
+gint tic(gpointer data);
 
 #endif //TETRIS_GTKTETRIS_H

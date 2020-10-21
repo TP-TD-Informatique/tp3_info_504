@@ -72,9 +72,10 @@ void createIHM(Jeu *jeu) {
     // Label delay
     GtkWidget *delayBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *delayLabel = gtk_label_new("Delay");
-    GtkWidget *delayNLabel = gtk_label_new("");
+    delayValue = gtk_label_new("10");
+    g_timeout_add(10, tic, jeu); // Toutes les secondes
     gtk_container_add(GTK_CONTAINER(delayBox), delayLabel);
-    gtk_container_add(GTK_CONTAINER(delayBox), delayNLabel);
+    gtk_container_add(GTK_CONTAINER(delayBox), delayValue);
     gtk_container_add(GTK_CONTAINER(rightBox), delayBox);
     // Ajout du rightBox
     gtk_container_add(GTK_CONTAINER(mainBox), rightBox);
@@ -167,7 +168,6 @@ gboolean realize_evt_reaction(GtkWidget *widget, gpointer data) {
 }
 
 gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer data) {
-    printf("dessine\n");
     Jeu *jeu = (Jeu *) data;
     cairo_t *cr = gdk_cairo_create(widget->window);
     dessineGrille(cr, jeu->grille);
@@ -200,11 +200,16 @@ gboolean left(GtkWidget *widget, gpointer data) {
 }
 
 gboolean down(GtkWidget *widget, gpointer data) {
+    delay = maxDelay;
     Jeu *jeu = (Jeu *) data;
     Piece piece = jeu->pieces[jeu->piece];
     int hauteur2 = hauteurExacte(jeu->grille, jeu->col, piece);
     ecrirePiece(jeu->grille, piece, jeu->col, hauteur2);
-    jeu->score += nettoyer(jeu->grille);
+    int newScore = nettoyer(jeu->grille);
+    if (newScore > 0)
+        for (int i = 0; i < newScore; ++i)
+            maxDelay *= 0.9; // Réduction du delay max en fonction du score
+    jeu->score += newScore;
     nouvellePiece(jeu);
     gtk_widget_queue_draw(canevas);
     return TRUE;
@@ -219,5 +224,26 @@ gboolean right(GtkWidget *widget, gpointer data) {
 }
 
 gboolean new(GtkWidget *widget, gpointer data) {
+    Jeu *jeu = (Jeu *) data;
+    initialiseGrille(jeu->grille);
+    initialisePieces(jeu->pieces);
+    jeu->score = 0;
+    nouvellePiece(jeu);
+    gtk_widget_queue_draw(canevas);
     return TRUE;
+}
+
+gint tic(gpointer data) {
+    delay -= 0.01;
+    char str[10];
+    sprintf(str, "%f", delay);
+    str[4] = '\0'; // Raccourcis la chaine, pour éviter d'avoir trop de zéro à la fin
+    gtk_label_set_text(GTK_LABEL(delayValue), str);
+    if (delay <= 0) {
+        delay = maxDelay;
+        down(NULL, data);
+    }
+    gtk_widget_queue_draw(delayValue);
+    g_timeout_add(10, tic, data);
+    return 0;
 }
