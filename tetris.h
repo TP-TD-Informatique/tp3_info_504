@@ -7,7 +7,7 @@
 #include <time.h>
 
 // Définition des constantes
-#define HAUTEUR 10
+#define HAUTEUR 22
 #define LARGEUR 15
 #define NB_PIECES 7
 #define HAUTEUR_MAX_DES_PIECES 4

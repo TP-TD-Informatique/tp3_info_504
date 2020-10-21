@@ -2,6 +2,8 @@
 
 
 int main(int argc, char *argv[]) {
+    srand(time(0));
+
     Jeu jeu;
     initialiseGrille(jeu.grille);
     initialisePieces(jeu.pieces);
@@ -10,9 +12,16 @@ int main(int argc, char *argv[]) {
 
     createIHM(&jeu);
 
+    nouvellePiece(&jeu);
+
     gtk_main();
 
     return EXIT_SUCCESS;
+}
+
+void nouvellePiece(Jeu *jeu) {
+    jeu->piece = (int) (((double) rand() / ((double) RAND_MAX)) * (NB_PIECES));
+    jeu->col = LARGEUR / 2 - (jeu->pieces[jeu->piece].largeur / 2);
 }
 
 void createIHM(Jeu *jeu) {
@@ -31,11 +40,11 @@ void createIHM(Jeu *jeu) {
     // Flèches
     GtkWidget *arrowBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *leftArrow = createArrowBtn(GTK_ARROW_LEFT);
-    g_signal_connect(leftArrow, "clicked", G_CALLBACK(left), NULL);
+    g_signal_connect(leftArrow, "clicked", G_CALLBACK(left), jeu);
     GtkWidget *downArrow = createArrowBtn(GTK_ARROW_DOWN);
-    g_signal_connect(downArrow, "clicked", G_CALLBACK(down), NULL);
+    g_signal_connect(downArrow, "clicked", G_CALLBACK(down), jeu);
     GtkWidget *rightArrow = createArrowBtn(GTK_ARROW_RIGHT);
-    g_signal_connect(rightArrow, "clicked", G_CALLBACK(right), NULL);
+    g_signal_connect(rightArrow, "clicked", G_CALLBACK(right), jeu);
     gtk_container_add(GTK_CONTAINER(arrowBox), leftArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), downArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), rightArrow);
@@ -47,7 +56,7 @@ void createIHM(Jeu *jeu) {
     // Boutons new et quit
     GtkWidget *btnBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *newBtn = createLabelBtn("New");
-    g_signal_connect(newBtn, "clicked", G_CALLBACK(new), NULL);
+    g_signal_connect(newBtn, "clicked", G_CALLBACK(new), jeu);
     GtkWidget *quitBtn = createLabelBtn("Quit");
     g_signal_connect(quitBtn, "clicked", G_CALLBACK(gtk_main_quit), NULL);
     gtk_container_add(GTK_CONTAINER(btnBox), newBtn);
@@ -86,8 +95,8 @@ void dessineGrille(cairo_t *cr, Grille grille) {
 
     // Zone blanche pour la grille effective
     cairo_set_source_rgb(cr, 1, 1, 1);
-    cairo_rectangle(cr, BORDER, 0, TAILLE_CARRE * LARGEUR, TAILLE_CARRE * HAUTEUR + 3 * BORDER);
-    cairo_fill_preserve(cr);
+    cairo_rectangle(cr, BORDER, 0, TAILLE_CARRE * LARGEUR, TAILLE_CARRE * HAUTEUR + 2 * BORDER);
+    cairo_fill(cr);
 
     for (int i = HAUTEUR - 1; i >= 0; --i) {
         for (int j = LARGEUR - 1; j >= 0; --j) {
@@ -97,6 +106,18 @@ void dessineGrille(cairo_t *cr, Grille grille) {
             }
         }
         printf("\n");
+    }
+}
+
+void dessinePiece(cairo_t *cr, Jeu *jeu) {
+    Piece piece = jeu->pieces[jeu->piece];
+    for (int i = piece.hauteur - 1; i >= 0; --i) {
+        for (int j = 0; j < piece.largeur; ++j) {
+            char c = piece.forme[i][j];
+            if (c != ' ') {
+                dessineCarre(cr, -i, jeu->col + j, c);
+            }
+        }
     }
 }
 
@@ -117,7 +138,7 @@ void dessineCarre(cairo_t *cr, int ligne, int colonne, char c) {
         default:
             cairo_set_source_rgb(cr, 0, 0, 0);
     }
-    cairo_rectangle(cr, colonne * TAILLE_CARRE + BORDER, ligne * TAILLE_CARRE + 3 * BORDER, TAILLE_CARRE, TAILLE_CARRE);
+    cairo_rectangle(cr, colonne * TAILLE_CARRE + BORDER, ligne * TAILLE_CARRE + 2 * BORDER, TAILLE_CARRE, TAILLE_CARRE);
     cairo_fill_preserve(cr);
 
     cairo_set_line_width(cr, 2);
@@ -138,6 +159,7 @@ void dessineCarre(cairo_t *cr, int ligne, int colonne, char c) {
             cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
     }
     cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
+    cairo_stroke(cr);
 }
 
 gboolean realize_evt_reaction(GtkWidget *widget, gpointer data) {
@@ -149,6 +171,7 @@ gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer 
     Jeu *jeu = (Jeu *) data;
     cairo_t *cr = gdk_cairo_create(widget->window);
     dessineGrille(cr, jeu->grille);
+    dessinePiece(cr, jeu);
     cairo_destroy(cr);
     return TRUE;
 }
@@ -169,6 +192,10 @@ GtkWidget *createLabelBtn(char *label) {
 }
 
 gboolean left(GtkWidget *widget, gpointer data) {
+    Jeu *jeu = (Jeu *) data;
+    jeu->col--;
+    if (jeu->col < 0) jeu->col = 0;
+    gtk_widget_queue_draw(widget);
     return TRUE;
 }
 
@@ -177,6 +204,10 @@ gboolean down(GtkWidget *widget, gpointer data) {
 }
 
 gboolean right(GtkWidget *widget, gpointer data) {
+    Jeu *jeu = (Jeu *) data;
+    jeu->col++;
+    if (jeu->col + jeu->pieces[jeu->piece].largeur >= LARGEUR) jeu->col = LARGEUR - jeu->pieces[jeu->piece].largeur;
+    gtk_widget_queue_draw(widget);
     return TRUE;
 }
 

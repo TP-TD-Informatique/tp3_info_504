@@ -11,7 +11,7 @@
 
 #define BORDER 50
 #define CANVAS_WIDTH TAILLE_CARRE * LARGEUR + 2 * BORDER // BORDER à gauche et BORDER à droite
-#define CANVAS_HEIGHT TAILLE_CARRE * HAUTEUR + 4 * BORDER // BORDER en bas et 3*BORDER en haut
+#define CANVAS_HEIGHT TAILLE_CARRE * HAUTEUR + 3 * BORDER // BORDER en bas et 2*BORDER en haut
 
 typedef struct {
     Grille grille;
@@ -22,9 +22,13 @@ typedef struct {
     int delay; // Le délais
 } Jeu;
 
+void nouvellePiece(Jeu *jeu);
+
 void createIHM(Jeu *jeu);
 
 void dessineGrille(cairo_t *cr, Grille grille);
+
+void dessinePiece(cairo_t *cr, Jeu *jeu);
 
 void dessineCarre(cairo_t *cr, int ligne, int colonne, char c);
 

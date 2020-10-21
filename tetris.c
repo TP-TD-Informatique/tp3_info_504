@@ -223,7 +223,7 @@ void ecrirePiece(Grille grille, Piece piece, int colonne, int hauteur) {
 }
 
 Piece pieceAleatoire(Piece pieces[NB_PIECES]) {
-    srand(time(0)); // Fait commencer la suite aléatoire a partir de l'heure système
+    //srand(time(0)); // Fait commencer la suite aléatoire a partir de l'heure système
     int alea = (int) (((double) rand() / ((double) RAND_MAX)) * (NB_PIECES));
     return pieces[alea];
 }
