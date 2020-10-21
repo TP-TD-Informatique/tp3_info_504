@@ -9,10 +9,20 @@
 
 #define TAILLE_CARRE 16
 
+int val0 = 17;
+
 GtkWidget *createIHM();
 
 GtkWidget *createArrowBtn(GtkArrowType type);
 
 GtkWidget *createLabelBtn(char *label);
+
+gboolean left(GtkWidget *widget, gpointer data);
+
+gboolean down(GtkWidget *widget, gpointer data);
+
+gboolean right(GtkWidget *widget, gpointer data);
+
+gboolean new(GtkWidget *widget, gpointer data);
 
 #endif //TETRIS_GTKTETRIS_H

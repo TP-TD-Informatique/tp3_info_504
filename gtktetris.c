@@ -5,7 +5,7 @@ int main(int argc, char *argv[]) {
 
     gtk_init(&argc, &argv);
 
-    GtkWidget *window = createIHM();
+    createIHM();
 
     gtk_main();
 
@@ -26,8 +26,11 @@ GtkWidget *createIHM() {
     // Flèches
     GtkWidget *arrowBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *leftArrow = createArrowBtn(GTK_ARROW_LEFT);
+    g_signal_connect(leftArrow, "clicked", G_CALLBACK(left), &val0);
     GtkWidget *downArrow = createArrowBtn(GTK_ARROW_DOWN);
+    g_signal_connect(downArrow, "clicked", G_CALLBACK(down), &val0);
     GtkWidget *rightArrow = createArrowBtn(GTK_ARROW_RIGHT);
+    g_signal_connect(rightArrow, "clicked", G_CALLBACK(right), &val0);
     gtk_container_add(GTK_CONTAINER(arrowBox), leftArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), downArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), rightArrow);
@@ -39,6 +42,7 @@ GtkWidget *createIHM() {
     // Boutons new et quit
     GtkWidget *btnBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *newBtn = createLabelBtn("New");
+    g_signal_connect(newBtn, "clicked", G_CALLBACK(new), &val0);
     GtkWidget *quitBtn = createLabelBtn("Quit");
     g_signal_connect(quitBtn, "clicked", G_CALLBACK(gtk_main_quit), NULL);
     gtk_container_add(GTK_CONTAINER(btnBox), newBtn);
@@ -80,4 +84,28 @@ GtkWidget *createLabelBtn(char *label) {
     GtkWidget *btn = gtk_button_new_with_label(label);
     gtk_widget_show(btn);
     return btn;
+}
+
+gboolean left(GtkWidget *widget, gpointer data) {
+    int val1 = *((int *) data);
+    printf("Gauche, val=%d\n", val1);
+    return TRUE;
+}
+
+gboolean down(GtkWidget *widget, gpointer data) {
+    int val1 = *((int *) data);
+    printf("Bas, val=%d\n", val1);
+    return TRUE;
+}
+
+gboolean right(GtkWidget *widget, gpointer data) {
+    int val1 = *((int *) data);
+    printf("Droite, val=%d\n", val1);
+    return TRUE;
+}
+
+gboolean new(GtkWidget *widget, gpointer data) {
+    int val1 = *((int *) data);
+    printf("New, val=%d\n", val1);
+    return TRUE;
 }
