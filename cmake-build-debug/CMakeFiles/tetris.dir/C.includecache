@@ -7,6 +7,10 @@
 #IncludeRegexTransform: 
 
 /home/kevin/DATA/Univ/semestre5/info504/tp3/gtktetris.c
+gtktetris.h
+/home/kevin/DATA/Univ/semestre5/info504/tp3/gtktetris.h
+
+/home/kevin/DATA/Univ/semestre5/info504/tp3/gtktetris.h
 stdlib.h
 -
 math.h

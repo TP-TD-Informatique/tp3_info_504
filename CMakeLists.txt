@@ -3,7 +3,7 @@ project(tetris C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(tetris tetris.c gtktetris.c)
+add_executable(tetris tetris.c tetris.h gtktetris.c gtktetris.h)
 
 find_package(GTK2 2.6 REQUIRED gtk)
 

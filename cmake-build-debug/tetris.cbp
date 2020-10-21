@@ -105,6 +105,9 @@
 		<Unit filename="/home/kevin/DATA/Univ/semestre5/info504/tp3/gtktetris.c">
 			<Option target="tetris"/>
 		</Unit>
+		<Unit filename="/home/kevin/DATA/Univ/semestre5/info504/tp3/gtktetris.h">
+			<Option target="tetris"/>
+		</Unit>
 		<Unit filename="/home/kevin/DATA/Univ/semestre5/info504/tp3/tetris.c">
 			<Option target="tetris"/>
 		</Unit>
