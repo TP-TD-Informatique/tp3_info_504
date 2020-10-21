@@ -9,6 +9,10 @@
 
 #define TAILLE_CARRE 16
 
+#define BORDER 50
+#define CANVAS_WIDTH TAILLE_CARRE * LARGEUR + 2 * BORDER // BORDER à gauche et BORDER à droite
+#define CANVAS_HEIGHT TAILLE_CARRE * HAUTEUR + 4 * BORDER // BORDER en bas et 3*BORDER en haut
+
 typedef struct {
     Grille grille;
     Piece pieces[NB_PIECES];
@@ -19,6 +23,10 @@ typedef struct {
 } Jeu;
 
 void createIHM(Jeu *jeu);
+
+void dessineGrille(cairo_t *cr, Grille grille);
+
+void dessineCarre(cairo_t *cr, int ligne, int colonne, char c);
 
 gboolean realize_evt_reaction(GtkWidget *widget, gpointer data);
 
