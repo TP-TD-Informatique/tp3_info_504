@@ -7,12 +7,11 @@ int main(int argc, char *argv[]) {
     Jeu jeu;
     initialiseGrille(jeu.grille);
     initialisePieces(jeu.pieces);
+    nouvellePiece(&jeu);
 
     gtk_init(&argc, &argv);
 
     createIHM(&jeu);
-
-    nouvellePiece(&jeu);
 
     gtk_main();
 
@@ -32,7 +31,7 @@ void createIHM(Jeu *jeu) {
 
     GtkWidget *leftBox = gtk_vbox_new(FALSE, 10);
     // Zone de dessin
-    GtkWidget *canevas = gtk_drawing_area_new();
+    canevas = gtk_drawing_area_new();
     gtk_drawing_area_size(GTK_DRAWING_AREA(canevas), CANVAS_WIDTH, CANVAS_HEIGHT);
     g_signal_connect(G_OBJECT(canevas), "realize", G_CALLBACK(realize_evt_reaction), jeu);
     g_signal_connect(G_OBJECT(canevas), "expose_event", G_CALLBACK(expose_evt_reaction), jeu);
@@ -105,7 +104,6 @@ void dessineGrille(cairo_t *cr, Grille grille) {
                 dessineCarre(cr, i, j, c);
             }
         }
-        printf("\n");
     }
 }
 
@@ -168,6 +166,7 @@ gboolean realize_evt_reaction(GtkWidget *widget, gpointer data) {
 }
 
 gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer data) {
+    printf("dessine\n");
     Jeu *jeu = (Jeu *) data;
     cairo_t *cr = gdk_cairo_create(widget->window);
     dessineGrille(cr, jeu->grille);
@@ -178,7 +177,7 @@ gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer 
 
 GtkWidget *createArrowBtn(GtkArrowType type) {
     GtkWidget *button = gtk_button_new();
-    GtkWidget *arrow = gtk_arrow_new(type, GTK_SHADOW_OUT);
+    GtkWidget *arrow = gtk_arrow_new(type, GTK_SHADOW_NONE);
     gtk_container_add(GTK_CONTAINER(button), arrow);
     gtk_widget_show_all(button);
 
@@ -195,11 +194,12 @@ gboolean left(GtkWidget *widget, gpointer data) {
     Jeu *jeu = (Jeu *) data;
     jeu->col--;
     if (jeu->col < 0) jeu->col = 0;
-    gtk_widget_queue_draw(widget);
+    gtk_widget_queue_draw(canevas);
     return TRUE;
 }
 
 gboolean down(GtkWidget *widget, gpointer data) {
+    gtk_widget_queue_draw(canevas);
     return TRUE;
 }
 
@@ -207,7 +207,7 @@ gboolean right(GtkWidget *widget, gpointer data) {
     Jeu *jeu = (Jeu *) data;
     jeu->col++;
     if (jeu->col + jeu->pieces[jeu->piece].largeur >= LARGEUR) jeu->col = LARGEUR - jeu->pieces[jeu->piece].largeur;
-    gtk_widget_queue_draw(widget);
+    gtk_widget_queue_draw(canevas);
     return TRUE;
 }
 

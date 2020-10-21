@@ -7,6 +7,8 @@
 
 #include "tetris.h"
 
+GtkWidget *canevas;
+
 #define TAILLE_CARRE 16
 
 #define BORDER 50
