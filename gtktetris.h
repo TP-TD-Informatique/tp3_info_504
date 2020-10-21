@@ -20,6 +20,10 @@ typedef struct {
 
 void createIHM(Jeu *jeu);
 
+gboolean realize_evt_reaction(GtkWidget *widget, gpointer data);
+
+gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer data);
+
 GtkWidget *createArrowBtn(GtkArrowType type);
 
 GtkWidget *createLabelBtn(char *label);
