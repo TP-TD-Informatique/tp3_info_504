@@ -4,13 +4,16 @@
 #include <stdlib.h>
 #include <math.h>
 #include <gtk/gtk.h>
+#include <stdbool.h>
 
 #include "tetris.h"
 
 GtkWidget *canevas;
 GtkWidget *delayValue;
+GtkWidget *scoreValue;
 double maxDelay = 10.0;
 double delay = 10.0;
+bool game = true;
 
 #define TAILLE_CARRE 16
 
@@ -21,7 +24,7 @@ double delay = 10.0;
 typedef struct {
     Grille grille;
     Piece pieces[NB_PIECES];
-    int piece; // La piece actuelle
+    Piece *piece; // La piece actuelle
     int col; // La colonne actuelle
     int score; // Le score
     int delay; // Le délais
@@ -56,5 +59,9 @@ gboolean new(GtkWidget *widget, gpointer data);
 gint ticDown(gpointer data);
 
 gint tic(gpointer data);
+
+gboolean rotateLeft(GtkWidget *widget, gpointer data);
+
+gboolean rotateRight(GtkWidget *widget, gpointer data);
 
 #endif //TETRIS_GTKTETRIS_H

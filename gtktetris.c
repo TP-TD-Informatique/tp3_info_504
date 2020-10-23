@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
 }
 
 void nouvellePiece(Jeu *jeu) {
-    jeu->piece = (int) (((double) rand() / ((double) RAND_MAX)) * (NB_PIECES));
-    jeu->col = LARGEUR / 2 - (jeu->pieces[jeu->piece].largeur / 2);
+    jeu->piece = &(jeu->pieces[(int) (((double) rand() / ((double) RAND_MAX)) * (NB_PIECES))]);
+    jeu->col = LARGEUR / 2 - (jeu->piece->largeur / 2);
 }
 
 void createIHM(Jeu *jeu) {
@@ -49,6 +49,17 @@ void createIHM(Jeu *jeu) {
     gtk_container_add(GTK_CONTAINER(arrowBox), downArrow);
     gtk_container_add(GTK_CONTAINER(arrowBox), rightArrow);
     gtk_container_add(GTK_CONTAINER(leftBox), arrowBox);
+    // Rotation
+    GtkWidget *rotationBox = gtk_hbox_new(TRUE, 10);
+    GtkWidget *leftRotate = createArrowBtn(GTK_ARROW_LEFT);
+    g_signal_connect(leftRotate, "clicked", G_CALLBACK(rotateLeft), jeu);
+    GtkWidget *labelRotation = gtk_label_new("rotation");
+    GtkWidget *rightRotate = createArrowBtn(GTK_ARROW_RIGHT);
+    g_signal_connect(rightRotate, "clicked", G_CALLBACK(rotateRight), jeu);
+    gtk_container_add(GTK_CONTAINER(rotationBox), leftRotate);
+    gtk_container_add(GTK_CONTAINER(rotationBox), labelRotation);
+    gtk_container_add(GTK_CONTAINER(rotationBox), rightRotate);
+    gtk_container_add(GTK_CONTAINER(leftBox), rotationBox);
     // Ajout du leftBox
     gtk_container_add(GTK_CONTAINER(mainBox), leftBox);
 
@@ -65,9 +76,9 @@ void createIHM(Jeu *jeu) {
     // Label score
     GtkWidget *scoreBox = gtk_hbox_new(TRUE, 10);
     GtkWidget *scoreLabel = gtk_label_new("Score");
-    GtkWidget *scoreNLabel = gtk_label_new("0");
+    scoreValue = gtk_label_new("0");
     gtk_container_add(GTK_CONTAINER(scoreBox), scoreLabel);
-    gtk_container_add(GTK_CONTAINER(scoreBox), scoreNLabel);
+    gtk_container_add(GTK_CONTAINER(scoreBox), scoreValue);
     gtk_container_add(GTK_CONTAINER(rightBox), scoreBox);
     // Label delay
     GtkWidget *delayBox = gtk_hbox_new(TRUE, 10);
@@ -110,10 +121,9 @@ void dessineGrille(cairo_t *cr, Grille grille) {
 }
 
 void dessinePiece(cairo_t *cr, Jeu *jeu) {
-    Piece piece = jeu->pieces[jeu->piece];
-    for (int i = piece.hauteur - 1; i >= 0; --i) {
-        for (int j = 0; j < piece.largeur; ++j) {
-            char c = piece.forme[i][j];
+    for (int i = jeu->piece->hauteur - 1; i >= 0; --i) {
+        for (int j = 0; j < jeu->piece->largeur; ++j) {
+            char c = jeu->piece->forme[i][j];
             if (c != ' ') {
                 dessineCarre(cr, -i, jeu->col + j, c);
             }
@@ -192,34 +202,47 @@ GtkWidget *createLabelBtn(char *label) {
 }
 
 gboolean left(GtkWidget *widget, gpointer data) {
-    Jeu *jeu = (Jeu *) data;
-    jeu->col--;
-    if (jeu->col < 0) jeu->col = 0;
-    gtk_widget_queue_draw(canevas);
+    if (game) {
+        Jeu *jeu = (Jeu *) data;
+        jeu->col--;
+        if (jeu->col < 0) jeu->col = 0;
+        gtk_widget_queue_draw(canevas);
+    }
     return TRUE;
 }
 
 gboolean down(GtkWidget *widget, gpointer data) {
-    delay = maxDelay;
-    Jeu *jeu = (Jeu *) data;
-    Piece piece = jeu->pieces[jeu->piece];
-    int hauteur2 = hauteurExacte(jeu->grille, jeu->col, piece);
-    ecrirePiece(jeu->grille, piece, jeu->col, hauteur2);
-    int newScore = nettoyer(jeu->grille);
-    if (newScore > 0)
-        for (int i = 0; i < newScore; ++i)
-            maxDelay *= 0.9; // Réduction du delay max en fonction du score
-    jeu->score += newScore;
-    nouvellePiece(jeu);
-    gtk_widget_queue_draw(canevas);
+    if (game) {
+        delay = maxDelay;
+        Jeu *jeu = (Jeu *) data;
+        int hauteur2 = hauteurExacte(jeu->grille, jeu->col, *jeu->piece);
+        if (hauteur2 + jeu->piece->hauteur - 1 >= HAUTEUR) {
+            game = false;
+        } else {
+            ecrirePiece(jeu->grille, *jeu->piece, jeu->col, hauteur2);
+            jeu->score++;
+            int newScore = nettoyer(jeu->grille);
+            if (newScore > 0)
+                for (int i = 0; i < newScore; ++i)
+                    maxDelay *= 0.9; // Réduction du delay max en fonction du score
+            jeu->score += 2 * newScore;
+            nouvellePiece(jeu);
+            gtk_widget_queue_draw(canevas);
+            char str[10];
+            sprintf(str, "%d", jeu->score);
+            gtk_label_set_text(GTK_LABEL(scoreValue), str);
+        }
+    }
     return TRUE;
 }
 
 gboolean right(GtkWidget *widget, gpointer data) {
-    Jeu *jeu = (Jeu *) data;
-    jeu->col++;
-    if (jeu->col + jeu->pieces[jeu->piece].largeur >= LARGEUR) jeu->col = LARGEUR - jeu->pieces[jeu->piece].largeur;
-    gtk_widget_queue_draw(canevas);
+    if (game) {
+        Jeu *jeu = (Jeu *) data;
+        jeu->col++;
+        if (jeu->col + jeu->piece->largeur >= LARGEUR) jeu->col = LARGEUR - jeu->piece->largeur;
+        gtk_widget_queue_draw(canevas);
+    }
     return TRUE;
 }
 
@@ -230,20 +253,37 @@ gboolean new(GtkWidget *widget, gpointer data) {
     jeu->score = 0;
     nouvellePiece(jeu);
     gtk_widget_queue_draw(canevas);
+    game = true;
     return TRUE;
 }
 
 gint tic(gpointer data) {
-    delay -= 0.01;
-    char str[10];
-    sprintf(str, "%f", delay);
-    str[4] = '\0'; // Raccourcis la chaine, pour éviter d'avoir trop de zéro à la fin
-    gtk_label_set_text(GTK_LABEL(delayValue), str);
-    if (delay <= 0) {
-        delay = maxDelay;
-        down(NULL, data);
+    if (game) {
+        delay -= 0.01;
+        char str[10];
+        sprintf(str, "%f", delay);
+        str[4] = '\0'; // Raccourcis la chaine, pour éviter d'avoir trop de zéro à la fin
+        gtk_label_set_text(GTK_LABEL(delayValue), str);
+        if (delay <= 0) {
+            delay = maxDelay;
+            down(NULL, data);
+        }
+        gtk_widget_queue_draw(delayValue);
+        g_timeout_add(10, tic, data);
     }
-    gtk_widget_queue_draw(delayValue);
-    g_timeout_add(10, tic, data);
     return 0;
+}
+
+gboolean rotateLeft(GtkWidget *widget, gpointer data) {
+    Jeu *jeu = (Jeu *) data;
+    jeu->piece = jeu->piece->rotG;
+    gtk_widget_queue_draw(canevas);
+    return TRUE;
+}
+
+gboolean rotateRight(GtkWidget *widget, gpointer data) {
+    Jeu *jeu = (Jeu *) data;
+    jeu->piece = jeu->piece->rotD;
+    gtk_widget_queue_draw(canevas);
+    return TRUE;
 }

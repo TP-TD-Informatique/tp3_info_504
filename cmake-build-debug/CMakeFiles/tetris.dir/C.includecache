@@ -17,6 +17,8 @@ math.h
 -
 gtk/gtk.h
 -
+stdbool.h
+-
 tetris.h
 /home/kevin/DATA/Univ/semestre5/info504/tp3/tetris.h
 
