@@ -27,6 +27,7 @@ void nouvellePiece(Jeu *jeu) {
 void createIHM(Jeu *jeu) {
     GtkWidget *window;
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     GtkWidget *mainBox = gtk_hbox_new(FALSE, 10);
 
