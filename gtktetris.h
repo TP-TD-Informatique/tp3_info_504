@@ -64,6 +64,4 @@ gboolean rotateLeft(GtkWidget *widget, gpointer data);
 
 gboolean rotateRight(GtkWidget *widget, gpointer data);
 
-gboolean keypress(GtkWidget *widget, GdkEventKey *event, gpointer data);
-
 #endif //TETRIS_GTKTETRIS_H
